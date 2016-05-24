@@ -7,9 +7,15 @@
 //
 
 #import "AppDelegate.h"
+#import "IQKeyboardManager.h"
+#import "CSHomeViewController.h"
+#import "CSSortViewController.h"
+#import "CSCarViewController.h"
+#import "CSMineViewController.h"
+#import "CSDiscoveryViewController.h"
 
-@interface AppDelegate ()
-
+@interface AppDelegate ()<UITabBarControllerDelegate>
+@property (nonatomic,strong) UITabBarController *tabbar;
 @end
 
 @implementation AppDelegate
@@ -17,8 +23,111 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    [self initTabBarController];
+    
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    [self isConnectionAvailable];
+    [self registered];
     return YES;
 }
+
+-(void)initTabBarController{
+    CSHomeViewController *homeVC = [[CSHomeViewController alloc] init];
+    
+    UINavigationController*homeNav = [[UINavigationController alloc] initWithRootViewController:homeVC];
+    
+    homeNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"首页" image:[[UIImage imageNamed:@"tabbar_00"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_00_s"]imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    CSSortViewController *sortVC = [[CSSortViewController alloc]init];
+    UINavigationController *sortNav = [[UINavigationController alloc] initWithRootViewController:sortVC];
+    sortNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"分类" image:[[UIImage imageNamed:@"tabbar_01"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_01_s"]imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    CSCarViewController *carVC = [[CSCarViewController alloc] init];
+    UINavigationController *carNav = [[UINavigationController alloc] initWithRootViewController:carVC];
+    carNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"购物车" image:[[UIImage imageNamed:@"tabbar_02"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_02_s"]imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    
+    CSMineViewController *mineVC = [[CSMineViewController alloc]init];
+    UINavigationController *mineNav = [[UINavigationController alloc] initWithRootViewController:mineVC];
+    mineNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"个人中心" image:[[UIImage imageNamed:@"tabbar_03"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_03_s"]imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    CSDiscoveryViewController *discoveryVC = [[CSDiscoveryViewController alloc]init];
+    UINavigationController *discoveryNav = [[UINavigationController alloc] initWithRootViewController:discoveryVC];
+    discoveryNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"发现" image:[[UIImage imageNamed:@"tabbar_04"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal] selectedImage:[[UIImage imageNamed:@"tabbar_04_s"]imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]];
+    
+    
+    
+    _tabbar = [[UITabBarController alloc] init];
+    
+    _tabbar.delegate = self;
+    
+    _tabbar.viewControllers = @[homeNav, sortNav, carNav, mineNav, discoveryNav];
+    
+    _tabbar.tabBar.barTintColor = UIColorFromRGB(0xf8f8f8);
+    
+    _tabbar.tabBar.translucent = NO;
+    //e16527
+//    0xDB0013
+    UIColor *titleHighlightedColor = UIColorFromRGB(0xFF522A);
+    
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       titleHighlightedColor, NSForegroundColorAttributeName,
+                                                       nil] forState:UIControlStateSelected];
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor blackColor], NSForegroundColorAttributeName,
+                                                       nil] forState:UIControlStateNormal];
+    
+    self.window.rootViewController = _tabbar;
+}
+
+
+-(BOOL) isConnectionAvailable{
+    
+    BOOL isExistenceNetwork = YES;
+    Reachability *reach = [Reachability reachabilityWithHostName:@"www.apple.com"];
+    switch ([reach currentReachabilityStatus]) {
+        case NotReachable:
+            isExistenceNetwork = NO;
+            //NSLog(@"notReachable");
+            break;
+        case ReachableViaWiFi:
+            isExistenceNetwork = YES;
+            //NSLog(@"WIFI");
+            break;
+        case ReachableViaWWAN:
+            isExistenceNetwork = YES;
+            //NSLog(@"2G/3G/4G");
+            break;
+    }
+    
+    if (!isExistenceNetwork)
+    {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"请检查网络连接" delegate:self
+                                                  cancelButtonTitle:@"确定"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+        return NO;
+    }
+    return isExistenceNetwork;
+}
+
+- (void)registered{
+    IQKeyboardManager *manager = [IQKeyboardManager sharedManager];
+    manager.enable = YES;
+    manager.shouldResignOnTouchOutside = YES;
+}
+
+- (void)alertView:(UIAlertController *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == 0)
+    {
+        exit(0);
+    }
+}
+
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
