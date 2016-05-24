@@ -95,7 +95,7 @@
     //照片背景
     self.imageView = [[UIImageView alloc]init];
     self.imageView.backgroundColor = kUIColorFromRGB(0xF3F3F3);
-    [bgView addSubview:self.imageView];
+//    [bgView addSubview:self.imageView];
     
     
     //商品名
