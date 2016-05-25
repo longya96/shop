@@ -21,17 +21,11 @@
     
     
     UITableView *myTableView;
-    //全选按钮
-    UIButton *selectAll;
+    
     //展示数据源数组
     NSMutableArray *dataArray;
-    //是否全选
-    BOOL isSelect;
     
-    //已选的商品集合
-    NSMutableArray *selectGoods;
     
-    UILabel *priceLabel;
 }
 
 @end
@@ -42,9 +36,8 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = RGBA(245.0, 246.0, 248.0 ,1.0);
-    
-    dataArray = [[NSMutableArray alloc]init];
-    selectGoods = [[NSMutableArray alloc]init];
+    self.automaticallyAdjustsScrollViewInsets = false;
+    dataArray = [NSMutableArray array];
     [self setupMainView];
     [self creatData];
 }
@@ -53,12 +46,6 @@
     [super viewWillAppear:YES];
     self.navigationController.navigationBarHidden = YES;
     [self setNavgation];
-    [selectGoods removeAllObjects];
-    isSelect = NO;
-    //    [self networkRequest];
-    selectAll.selected = NO;
-    
-    priceLabel.text = [NSString stringWithFormat:@"￥0.00"];
 }
 
 - (void)setNavgation{
@@ -104,26 +91,7 @@
     }
 }
 
--(void)selectAllBtnClick:(UIButton*)button
-{
-    //点击全选时,把之前已选择的全部删除
-    [selectGoods removeAllObjects];
-    
-    button.selected = !button.selected;
-    isSelect = button.selected;
-    if (isSelect) {
-        
-        for (CSCarModel *model in dataArray) {
-            [selectGoods addObject:model];
-        }
-    }
-    else
-    {
-        [selectGoods removeAllObjects];
-    }
-    
-    [myTableView reloadData];
-}
+
 
 
 
@@ -137,16 +105,16 @@
     //当购物车不为空时,tableView展示
     else
     {
-        UIView *vi = [self.view viewWithTag:TAG_BACKGROUNDVIEW];
+        UIView *vi = [self.view viewWithTag:100];
         [vi removeFromSuperview];
         
-        myTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 170) style:UITableViewStylePlain];
+        myTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 64, screen_width, screen_height - 113) style:UITableViewStylePlain];
         self.automaticallyAdjustsScrollViewInsets = false;
         myTableView.delegate = self;
         myTableView.dataSource = self;
         myTableView.rowHeight = 100;
         myTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        myTableView.backgroundColor = RGBCOLOR(245, 246, 248);
+        myTableView.backgroundColor = RGB(245, 246, 248);
         
         [self.view addSubview:myTableView];
         
@@ -174,7 +142,7 @@
     warnLabel.textAlignment = NSTextAlignmentCenter;
     warnLabel.text = @"购物车好空,买点什么呗!";
     warnLabel.font = [UIFont systemFontOfSize:15];
-    warnLabel.textColor = kUIColorFromRGB(0x706F6F);
+    warnLabel.textColor = UIColorFromRGB(0x706F6F);
     [backgroundView addSubview:warnLabel];
     
     //默认视图按钮
