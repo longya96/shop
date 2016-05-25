@@ -52,7 +52,7 @@
     
     self.goodImageView.image = model.image;
     self.nameLabel.text = model.nameStr;
-    self.priceLabel.text = model.price;
+    self.priceLabel.text = [NSString stringWithFormat:@"￥%@",model.price];
     self.dateLabel.text = model.dateStr;
     self.numberLabel.text = [NSString stringWithFormat:@"x%ld",(long)model.number];
     self.sizeLabel.text = model.sizeStr;
