@@ -97,7 +97,7 @@
 
 
 - (void)setMenuBar{
-    menuBarView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, screen_width, 44)];
+    menuBarView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, screen_width, toptablbar_height)];
     menuBarView.backgroundColor = [UIColor groupTableViewBackgroundColor];
     NSArray *menuAry = @[@"销量", @"时间", @"价格", @"筛选"];
     for (int i = 0; i < 5; i++) {

@@ -84,7 +84,9 @@
 // 4.屏幕大小尺寸
 #define screen_width [UIScreen mainScreen].bounds.size.width
 #define screen_height [UIScreen mainScreen].bounds.size.height
-
+#define navigation_height 64
+#define bottom_height 49
+#define toptablbar_height 44
 
 //取view的坐标及长宽
 #define W(view)    view.frame.size.width

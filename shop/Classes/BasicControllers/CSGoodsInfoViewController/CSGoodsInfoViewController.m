@@ -14,7 +14,6 @@
 
 #define TopViewH 380
 #define MiddleViewH 195
-#define BottomH 49
 #define TopTabBarH 50
 #define NaviBarH 64.0
 
@@ -27,6 +26,7 @@
 @property(nonatomic,weak)UIView* NavBarView;
 
 @property (weak, nonatomic) UIScrollView *MyScrollView;
+@property (strong, nonatomic) UITableView *firstPageView;
 @property (weak, nonatomic) CSGooddetailsTopView* topView;
 @property (weak, nonatomic) CSGooddetailsMiddleView* middleView;
 @property (weak, nonatomic) CSGooddetailsBottomView* bottomView;
@@ -40,7 +40,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.TopViewScale = 1.0;
+//    self.TopViewScale = 1.0;
     [self initView];
     [self setNavigationView];//提示,要在最后添加
     
@@ -54,9 +54,6 @@
     [self.view addSubview:navigationView];
 }
 
--(void)clickBack{
-    [self.navigationController popViewControllerAnimated:YES];
-}
 
 -(void)viewDidDisappear:(BOOL)animated{
     //释放下拉刷新内存
@@ -68,7 +65,7 @@
         UIScrollView* scroll = [[UIScrollView alloc] init];
         _MyScrollView = scroll;
         scroll.delegate = self;
-        scroll.frame = CGRectMake(0.0, 0.0, screen_width, screen_height-BottomH);
+        scroll.frame = CGRectMake(0.0, 0.0, screen_width, screen_height-bottom_height);
         scroll.pagingEnabled = YES;//进行分页
         scroll.showsVerticalScrollIndicator = NO;
         scroll.tag = 0;
@@ -81,7 +78,7 @@
  */
 -(void)initBottomView{
     UIView* view = [[UIView alloc] init];
-    view.frame = CGRectMake(0,CGRectGetMaxY(self.MyScrollView.frame), screen_width, BottomH);
+    view.frame = CGRectMake(0,CGRectGetMaxY(self.MyScrollView.frame), screen_width, bottom_height);
     view.backgroundColor = [UIColor whiteColor];
     
     CGFloat btnW = 100;
@@ -128,32 +125,26 @@
 -(void)initView{
     //初始化第一个页面
     //初始化第一个页面的父亲view
-    UIView* firstPageView = [[UIView alloc] init];
-    firstPageView.frame = CGRectMake(0, 0, screen_width, screen_height - BottomH);
-    CSGooddetailsTopView* topView = [CSGooddetailsTopView view];
-    self.topView = topView;
-    topView.frame = CGRectMake(0,0, screen_width, TopViewH);
-    [firstPageView addSubview:topView];
+     _firstPageView= [[UITableView alloc] initWithFrame:CGRectMake(0, 0, screen_width, screen_height - bottom_height) style:UITableViewStyleGrouped];
+    _firstPageView.dataSource = self;
+    _firstPageView.delegate = self;
+    _firstPageView.showsVerticalScrollIndicator = NO;
+    /*
     CSGooddetailsMiddleView* middleView = [CSGooddetailsMiddleView view];
     self.middleView = middleView;
     middleView.frame = CGRectMake(0,CGRectGetMaxY(topView.frame) + 6, screen_width, MiddleViewH);
-    [firstPageView addSubview:middleView];
+//    [firstPageView addSubview:middleView];
     CSGooddetailsBottomView* bottomView = [CSGooddetailsBottomView view];
     self.bottomView = bottomView;
-    CGFloat bottomViewY = 0.0;
-    if ((screen_width==414)?1:0) {
-        bottomViewY = self.MyScrollView.frame.size.height - BottomH;
-    }else{
-        bottomViewY = CGRectGetMaxY(middleView.frame);
-    }
-    bottomView.frame = CGRectMake(0,bottomViewY, screen_width, BottomH);
-    [firstPageView addSubview:bottomView];
-    [self.MyScrollView addSubview:firstPageView];
+    CGFloat bottomViewY = CGRectGetMaxY(_firstPageView.frame);
+    bottomView.frame = CGRectMake(0,bottomViewY, screen_width, bottom_height);
+    [_firstPageView addSubview:bottomView];*/
+    [self.MyScrollView addSubview:_firstPageView];
     [self initBottomView];
     //初始化第二个页面
     [self addSecondPageTopTabBar];
     // 设置scrollview内容区域大小
-    self.MyScrollView.contentSize = CGSizeMake(screen_width, (screen_height - BottomH)*2);
+    self.MyScrollView.contentSize = CGSizeMake(screen_width, (screen_height - bottom_height)*2);
 }
 /**
  添加第二个页面顶部tabBar
@@ -161,47 +152,48 @@
 -(void)addSecondPageTopTabBar{
     //初始化第二个页面的父亲view
     UIView* secondPageView = [[UIView alloc] init];
-    secondPageView.frame = CGRectMake(0, screen_height - BottomH, screen_width, screen_height - BottomH);
+    secondPageView.frame = CGRectMake(0, screen_height, screen_width, screen_height - bottom_height);
     NSArray* array  = @[@"图文详情",@"宝贝评价",@"宝贝咨询"];
     CSGoodsdetailsTopTabBar* tabBar = [[CSGoodsdetailsTopTabBar alloc] initWithArray:array] ;
-    tabBar.frame = CGRectMake(0,NaviBarH, screen_width, TopTabBarH);
+    tabBar.frame = CGRectMake(0,navigation_height, screen_width, toptablbar_height);
     tabBar.backgroundColor = [UIColor whiteColor];
     tabBar.delegate = self;
     self.TopTabBar = tabBar;
     [secondPageView addSubview:tabBar];
     //初始化一个UITableView
-    UITableView* tableview = [[UITableView alloc] init];
-    self.detailTableview = tableview;
-    tableview.dataSource = self;
-    tableview.delegate = self;
-    tableview.tag = 1;
-    tableview.frame = CGRectMake(0, CGRectGetMaxY(tabBar.frame), screen_width,secondPageView.frame.size.height - tabBar.frame.size.height-NaviBarH);
-    
-    
-    [secondPageView addSubview:tableview];
+    UITableView* secondtableview = [[UITableView alloc] init];
+    self.detailTableview = secondtableview;
+    secondtableview.dataSource = self;
+    secondtableview.delegate = self;
+    secondtableview.tag = 1;
+    secondtableview.frame = CGRectMake(0, CGRectGetMaxY(tabBar.frame), screen_width,secondPageView.frame.size.height - tabBar.frame.size.height-navigation_height);
+    [secondPageView addSubview:secondtableview];
     [self.MyScrollView addSubview:secondPageView];
 }
 #pragma -- <UIScrollViewDelegate>
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    NSLog(@" --== %f",scrollView.contentOffset.y);
-    if(scrollView.tag == 0){
-        if(scrollView.contentOffset.y<0){
-            if(self.TopViewScale<1.01){
-                self.TopViewScale += 0.00015f;
-                
-            }
-            scrollView.contentOffset = CGPointMake(0, 0);
-        }else{
-            self.NavBarView.backgroundColor = RGBA(255.0,255.0,255.0, scrollView.contentOffset.y/(screen_height-BottomH));
-        }
-        if(scrollView.contentOffset.y == (screen_height-BottomH)){
-            scrollView.scrollEnabled = NO;
-        }else if (scrollView.contentOffset.y == -NaviBarH && !scrollView.isDragging){
-            [UIView animateWithDuration:0.3 animations:^{
+    if (scrollView == _MyScrollView) {
+        NSLog(@" --== %f",scrollView.contentOffset.y);
+        if(scrollView.tag == 0){
+            if(scrollView.contentOffset.y<0){
+                if(self.TopViewScale<1.01){
+                    self.TopViewScale += 0.00015f;
+                    
+                }
                 scrollView.contentOffset = CGPointMake(0, 0);
-            }];
-        }else;
+            }else{
+                self.NavBarView.backgroundColor = RGBA(255.0,255.0,255.0, scrollView.contentOffset.y/(screen_height-bottom_height));
+            }
+            if(scrollView.contentOffset.y == (screen_height)){
+                scrollView.scrollEnabled = YES;
+            }else if (scrollView.contentOffset.y == -navigation_height && !scrollView.isDragging){
+                [UIView animateWithDuration:0.3 animations:^{
+                    scrollView.contentOffset = CGPointMake(0, 0);
+                }];
+            }else;
+        }
     }
+    
 }
 -(void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset{
     NSLog(@" endd-- %f",self.TopViewScale);
@@ -222,16 +214,63 @@
 #pragma -- UITableViewDataSource
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 0;
+    if (tableView == _firstPageView) {
+        return 5;
+    }else{
+        return 0;
+    }
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    
     return 1;
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return nil;
+    if (tableView == _firstPageView) {
+        static NSString *cellIdentifier = @"goodInfo";
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+        if (!cell) {
+            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        }
+        return cell;
+    }else{
+        return nil;
+    }
     
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    if (tableView == _firstPageView) {
+        switch (section) {
+            case 0:{
+                CSGooddetailsTopView* topView = [CSGooddetailsTopView view];
+                topView.frame = CGRectMake(0,0, screen_width, TopViewH);
+                return topView;
+                break;
+            }
+                
+            default:{
+                UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 40)];
+                view.backgroundColor = [UIColor redColor];
+                UILabel *title = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, screen_width*0.7, 30)];
+                title.text = @"已选";
+                [view addSubview:title];
+                
+                UIImageView *imageviews = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"commidity_collection"]];
+//                [view addSubview:imageviews];
+                return view;
+                break;
+            }
+        }
+    }else{
+        return nil;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    UIView *view = [self tableView:_firstPageView viewForHeaderInSection:section];
+    return view.bounds.size.height;
 }
 
 #pragma -- UITableViewDelegate
