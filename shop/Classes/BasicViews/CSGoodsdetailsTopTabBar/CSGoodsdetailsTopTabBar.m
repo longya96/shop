@@ -7,6 +7,7 @@
 //
 
 #import "CSGoodsdetailsTopTabBar.h"
+#import "CSTopButton.h"
 
 #define bottomViewW 6.0
 @interface CSGoodsdetailsTopTabBar()
@@ -105,6 +106,13 @@
     if([_delegate respondsToSelector:@selector(tabBar:didSelectIndex:)]){//判断代理有没有实现这个函数了
         [_delegate tabBar:self didSelectIndex:sender.tag];
     }
+}
+/**
+ 设定
+ */
+- (void)setSelectedTabBtnWithIndex:(NSInteger)index{
+    UIButton *btn = (UIButton *)[self viewWithTag:index];
+    [self TabBtnClick:btn];
 }
 
 /*

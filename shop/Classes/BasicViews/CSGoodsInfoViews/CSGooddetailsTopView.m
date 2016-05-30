@@ -2,13 +2,17 @@
 //  CSGooddetailsTopView.m
 //  shop
 //
-//  Created by newtouch on 16/5/5.
+//  Created by newtouch on 16/5/30.
 //  Copyright © 2016年 vavens. All rights reserved.
 //
 
 #import "CSGooddetailsTopView.h"
 
 @implementation CSGooddetailsTopView
++ (instancetype)view
+{
+    return [[[NSBundle mainBundle] loadNibNamed:@"CSGooddetailsTopView" owner:nil options:nil] firstObject];
+}
 
 /*
 // Only override drawRect: if you perform custom drawing.
@@ -17,17 +21,5 @@
     // Drawing code
 }
 */
--(void)awakeFromNib{
-    
-}
--(void)collectAction:(UIButton*)sender{
-    sender.selected = sender.isSelected?NO:YES;
-    
-}
-+ (instancetype)view
-{
-    return [[[NSBundle mainBundle] loadNibNamed:@"CSGooddetailsTopView" owner:nil options:nil] firstObject];
-}
-
 
 @end

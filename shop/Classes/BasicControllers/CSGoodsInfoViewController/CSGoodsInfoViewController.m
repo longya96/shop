@@ -11,28 +11,27 @@
 #import "CSGooddetailsTopView.h"
 #import "CSGooddetailsMiddleView.h"
 #import "CSGooddetailsBottomView.h"
+#import "MJRefresh.h"
 
-#define TopViewH 380
-#define MiddleViewH 195
-#define TopTabBarH 50
-#define NaviBarH 64.0
 
-@interface CSGoodsInfoViewController ()<UITableViewDelegate,UITableViewDataSource,CSGoodsdetailsTopTabBarDelegate>
+@interface CSGoodsInfoViewController ()<UITableViewDelegate,UITableViewDataSource,CSGoodsdetailsTopTabBarDelegate,UIScrollViewDelegate>
 {
     UIView *bgNavView;
     UILabel *navTitle;
 }
-@property(nonatomic,weak)CSGoodsdetailsTopTabBar *TopTabBar;
+
+@property(nonatomic,weak)CSGoodsdetailsTopTabBar* TopTabBar;
 @property(nonatomic,weak)UIView* NavBarView;
 
-@property (weak, nonatomic) UIScrollView *MyScrollView;
-@property (strong, nonatomic) UITableView *firstPageView;
+@property (strong, nonatomic) UIScrollView *MyScrollView;
 @property (weak, nonatomic) CSGooddetailsTopView* topView;
 @property (weak, nonatomic) CSGooddetailsMiddleView* middleView;
 @property (weak, nonatomic) CSGooddetailsBottomView* bottomView;
 @property (weak, nonatomic) UITableView* detailTableview;
+@property (weak, nonatomic) MJRefreshHeaderView* secondheader;
+@property (weak, nonatomic) MJRefreshFooterView* firstfooter;
 @property (assign, nonatomic)float TopViewScale;
-
+@property (strong, nonatomic) UIImageView *imageView;
 @end
 
 @implementation CSGoodsInfoViewController
@@ -43,7 +42,6 @@
 //    self.TopViewScale = 1.0;
     [self initView];
     [self setNavigationView];//提示,要在最后添加
-    
 }
 
 /**
@@ -54,22 +52,21 @@
     [self.view addSubview:navigationView];
 }
 
-
 -(void)viewDidDisappear:(BOOL)animated{
     //释放下拉刷新内存
+    [self.secondheader free];
     [self.MyScrollView removeFromSuperview];
     [super viewDidDisappear:animated];
 }
 -(UIScrollView *)MyScrollView{
     if (_MyScrollView == nil) {
-        UIScrollView* scroll = [[UIScrollView alloc] init];
-        _MyScrollView = scroll;
-        scroll.delegate = self;
-        scroll.frame = CGRectMake(0.0, 0.0, screen_width, screen_height-bottom_height);
-        scroll.pagingEnabled = YES;//进行分页
-        scroll.showsVerticalScrollIndicator = NO;
-        scroll.tag = 0;
-        [self.view addSubview:scroll];
+        _MyScrollView = [[UIScrollView alloc] init];
+        _MyScrollView.delegate = self;
+        _MyScrollView.frame = CGRectMake(0.0, 0.0, screen_width, screen_height - bottom_height);
+        _MyScrollView.pagingEnabled = YES;//进行分页
+        _MyScrollView.showsVerticalScrollIndicator = NO;
+        _MyScrollView.tag = 0;
+        [self.view addSubview:_MyScrollView];
     }
     return _MyScrollView;
 }
@@ -82,12 +79,12 @@
     view.backgroundColor = [UIColor whiteColor];
     
     CGFloat btnW = 100;
-    CGFloat btnH = 45;
+    CGFloat btnH = 52;
     CGFloat margin = 3;
     //加入购物车按钮
     CGFloat aX = screen_width - btnW;
     UIButton* aBtn = [[UIButton alloc] init];
-    aBtn.frame = CGRectMake(aX, 2, btnW, btnH);
+    aBtn.frame = CGRectMake(aX, 0, btnW, btnH);
     [aBtn setTitle:@"加入购物车" forState:UIControlStateNormal];
     [aBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     aBtn.backgroundColor = RGBA(250.0, 63.0, 51.0, 1.0);
@@ -97,7 +94,7 @@
     //立即购买按钮
     CGFloat bX = screen_width - 2*btnW - margin;
     UIButton* bBtn = [[UIButton alloc] init];
-    bBtn.frame = CGRectMake(bX, 2, btnW, btnH);
+    bBtn.frame = CGRectMake(bX, 0, btnW, btnH);
     [bBtn setTitle:@"立即购买" forState:UIControlStateNormal];
     [bBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     bBtn.backgroundColor = RGBA(0.0, 162.0, 154.0, 1.0);
@@ -125,81 +122,99 @@
 -(void)initView{
     //初始化第一个页面
     //初始化第一个页面的父亲view
-     _firstPageView= [[UITableView alloc] initWithFrame:CGRectMake(0, 0, screen_width, screen_height - bottom_height) style:UITableViewStyleGrouped];
-    _firstPageView.dataSource = self;
-    _firstPageView.delegate = self;
-    _firstPageView.showsVerticalScrollIndicator = NO;
-    /*
-    CSGooddetailsMiddleView* middleView = [CSGooddetailsMiddleView view];
-    self.middleView = middleView;
-    middleView.frame = CGRectMake(0,CGRectGetMaxY(topView.frame) + 6, screen_width, MiddleViewH);
-//    [firstPageView addSubview:middleView];
-    CSGooddetailsBottomView* bottomView = [CSGooddetailsBottomView view];
-    self.bottomView = bottomView;
-    CGFloat bottomViewY = CGRectGetMaxY(_firstPageView.frame);
-    bottomView.frame = CGRectMake(0,bottomViewY, screen_width, bottom_height);
-    [_firstPageView addSubview:bottomView];*/
-    [self.MyScrollView addSubview:_firstPageView];
-    [self initBottomView];
+    
+    UIView* firstPageView = [[UIView alloc] init];
+    firstPageView.frame = CGRectMake(0, 0, screen_width, screen_height - bottom_height);
+        UITableView *firstPageTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screen_width, screen_height-bottom_height) style:(UITableViewStyleGrouped)];
+    firstPageTableView.delegate = self;
+    firstPageTableView.dataSource = self;
+    firstPageTableView.tag = 1;
+    firstPageTableView.showsVerticalScrollIndicator = NO;
+    CSGooddetailsBottomView*bottomView = [CSGooddetailsBottomView view];
+    bottomView.frame = CGRectMake(0,0, screen_width, bottom_height);
+    [firstPageTableView setTableFooterView:bottomView];
+    
+    [firstPageView addSubview:firstPageTableView];
+    
+    
+    [self.MyScrollView addSubview:firstPageView];
+    
+    
     //初始化第二个页面
-    [self addSecondPageTopTabBar];
+    [self addSecondPageView];
+    
     // 设置scrollview内容区域大小
     self.MyScrollView.contentSize = CGSizeMake(screen_width, (screen_height - bottom_height)*2);
+    [self initBottomView];
 }
 /**
- 添加第二个页面顶部tabBar
+ 添加第二个页面
  */
--(void)addSecondPageTopTabBar{
+-(void)addSecondPageView{
     //初始化第二个页面的父亲view
     UIView* secondPageView = [[UIView alloc] init];
-    secondPageView.frame = CGRectMake(0, screen_height, screen_width, screen_height - bottom_height);
-    NSArray* array  = @[@"图文详情",@"宝贝评价",@"宝贝咨询"];
+    secondPageView.frame = CGRectMake(0, screen_height - bottom_height, screen_width, screen_height - bottom_height);
+    NSArray* array  = @[@"图文详情",@"详细参数",@"包装清单"];
     CSGoodsdetailsTopTabBar* tabBar = [[CSGoodsdetailsTopTabBar alloc] initWithArray:array] ;
-    tabBar.frame = CGRectMake(0,navigation_height, screen_width, toptablbar_height);
+    tabBar.frame = CGRectMake(0,navigation_height, screen_width, 44);
     tabBar.backgroundColor = [UIColor whiteColor];
     tabBar.delegate = self;
     self.TopTabBar = tabBar;
     [secondPageView addSubview:tabBar];
     //初始化一个UITableView
-    UITableView* secondtableview = [[UITableView alloc] init];
-    self.detailTableview = secondtableview;
-    secondtableview.dataSource = self;
-    secondtableview.delegate = self;
-    secondtableview.tag = 1;
-    secondtableview.frame = CGRectMake(0, CGRectGetMaxY(tabBar.frame), screen_width,secondPageView.frame.size.height - tabBar.frame.size.height-navigation_height);
-    [secondPageView addSubview:secondtableview];
+    UITableView* secondPageTableView = [[UITableView alloc] init];
+    self.detailTableview = secondPageTableView;
+    secondPageTableView.dataSource = self;
+    secondPageTableView.delegate = self;
+    secondPageTableView.tag = 2;
+    secondPageTableView.frame = CGRectMake(0, CGRectGetMaxY(tabBar.frame), screen_width,secondPageView.frame.size.height - tabBar.frame.size.height-navigation_height);
+    MJRefreshHeaderView* RheaderView = [MJRefreshHeaderView header];
+    RheaderView.scrollView = secondPageTableView;
+    self.secondheader = RheaderView;
+    RheaderView.beginRefreshingBlock = ^(MJRefreshBaseView* refreshView){
+        NSOperationQueue* Queue = [[NSOperationQueue alloc] init];
+        [Queue addOperationWithBlock:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView animateWithDuration:0.5 animations:^{
+                    self.MyScrollView.contentOffset = CGPointMake(0, 0);
+                } completion:^(BOOL finished) {
+                    self.MyScrollView.scrollEnabled = YES;
+                }];
+                [self.secondheader endRefreshing];
+            });
+        }];
+    };
+    
+    [secondPageView addSubview:secondPageTableView];
     [self.MyScrollView addSubview:secondPageView];
 }
 #pragma -- <UIScrollViewDelegate>
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView{
-    if (scrollView == _MyScrollView) {
-        NSLog(@" --== %f",scrollView.contentOffset.y);
-        if(scrollView.tag == 0){
-            if(scrollView.contentOffset.y<0){
-                if(self.TopViewScale<1.01){
-                    self.TopViewScale += 0.00015f;
-                    
-                }
-                scrollView.contentOffset = CGPointMake(0, 0);
-            }else{
-                self.NavBarView.backgroundColor = RGBA(255.0,255.0,255.0, scrollView.contentOffset.y/(screen_height-bottom_height));
+    NSLog(@" --== %f",scrollView.contentOffset.y);
+    if(scrollView.tag == 0){
+        if(scrollView.contentOffset.y<0){
+            if(self.TopViewScale<1.1){
+                self.TopViewScale += 0.00015f;
+                [self.imageView setTransform:CGAffineTransformScale(self.imageView.transform, self.TopViewScale, self.TopViewScale)];
             }
-            if(scrollView.contentOffset.y == (screen_height)){
-                scrollView.scrollEnabled = YES;
-            }else if (scrollView.contentOffset.y == -navigation_height && !scrollView.isDragging){
-                [UIView animateWithDuration:0.3 animations:^{
-                    scrollView.contentOffset = CGPointMake(0, 0);
-                }];
-            }else;
+            scrollView.contentOffset = CGPointMake(0, 0);
+        }else{
+            self.NavBarView.backgroundColor = RGBA(0.0,162.0,154.0, scrollView.contentOffset.y/(screen_height-bottom_height));
         }
+        if(scrollView.contentOffset.y == (screen_height-bottom_height)){
+            scrollView.scrollEnabled = NO;
+        }else if (scrollView.contentOffset.y == -navigation_height && !scrollView.isDragging){
+            [UIView animateWithDuration:0.3 animations:^{
+                scrollView.contentOffset = CGPointMake(0, 0);
+            }];
+        }else;
     }
-    
 }
 -(void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset{
     NSLog(@" endd-- %f",self.TopViewScale);
     self.TopViewScale = 1.0;
     [UIView animateWithDuration:0.5 animations:^{
-       
+        [self.imageView setTransform:CGAffineTransformIdentity];//恢复原来的大小
     }];
 }
 
@@ -209,67 +224,113 @@
 
 #pragma -- MyOrderTopTabBarDelegate(顶部标题栏delegate)
 -(void)tabBar:(CSGoodsdetailsTopTabBar *)tabBar didSelectIndex:(NSInteger)index{
+    
     NSLog(@"点击了 －－－ %ld",index);
 }
 #pragma -- UITableViewDataSource
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if (tableView == _firstPageView) {
-        return 5;
-    }else{
-        return 0;
+    switch (tableView.tag) {
+        case 1:{
+            return 0;
+            break;
+        }
+        default:
+            return 0;
+            break;
     }
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    
-    return 1;
+    switch (tableView.tag) {
+        case 1:{
+            return 4;
+            break;
+        }
+        default:
+            return 1;
+            break;
+    }
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (tableView == _firstPageView) {
-        static NSString *cellIdentifier = @"goodInfo";
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-        if (!cell) {
-            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        }
-        return cell;
-    }else{
-        return nil;
-    }
+    return nil;
     
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
-    if (tableView == _firstPageView) {
-        switch (section) {
-            case 0:{
-                CSGooddetailsTopView* topView = [CSGooddetailsTopView view];
-                topView.frame = CGRectMake(0,0, screen_width, TopViewH);
-                return topView;
-                break;
+    switch (tableView.tag) {
+        case 1:{
+            switch (section) {
+                case 0:{
+                    CSGooddetailsTopView *view = [CSGooddetailsTopView view];
+                    view.frame = CGRectMake(0, 0, screen_width, 380);
+                    return view;
+                    break;
+                }
+                case 1:{
+                    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 40)];
+                    view.backgroundColor = [UIColor whiteColor];
+                    UILabel*title = [[UILabel alloc]initWithFrame:CGRectMake(10, 10, screen_width, 21)];
+                    title.text = @"选择颜色分类";
+                    [view addSubview:title];
+                    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+                    [btn addTarget:self action:@selector(clickBtn:) forControlEvents:UIControlEventTouchUpInside];
+                    btn.frame = view.frame;
+                    btn.tag = 200 + section;
+                    [view addSubview:btn];
+                    return view;
+                    break;
+                }
+                default:{
+                    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 40)];
+                    view.backgroundColor = [UIColor whiteColor];
+                    UILabel*title = [[UILabel alloc]initWithFrame:CGRectMake(10, 10, screen_width, 21)];
+                    title.text = @"商品详情";
+                    [view addSubview:title];
+                    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+                    [btn addTarget:self action:@selector(clickBtn:) forControlEvents:UIControlEventTouchUpInside];
+                    btn.frame = view.frame;
+                    btn.tag = 200 + section;
+                    [view addSubview:btn];
+                    return view;
+                    break;
+                }
             }
-                
-            default:{
-                UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, screen_width, 40)];
-                view.backgroundColor = [UIColor redColor];
-                UILabel *title = [[UILabel alloc]initWithFrame:CGRectMake(10, 5, screen_width*0.7, 30)];
-                title.text = @"已选";
-                [view addSubview:title];
-                
-                UIImageView *imageviews = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"commidity_collection"]];
-//                [view addSubview:imageviews];
-                return view;
-                break;
-            }
+            break;
         }
-    }else{
-        return nil;
+        default:{
+            return nil;
+            break;
+        }
     }
 }
 
+-(void)clickBtn:(UIButton *)sender{
+    switch (sender.tag) {
+        case 202:{
+            [UIView animateWithDuration:0.3 animations:^{
+                _MyScrollView.contentOffset = CGPointMake(0, screen_height-49);
+                [_TopTabBar setSelectedTabBtnWithIndex:1];
+            }];
+            break;
+        }
+        case 203:{
+            [UIView animateWithDuration:0.3 animations:^{
+                _MyScrollView.contentOffset = CGPointMake(0, screen_height-49);
+                [_TopTabBar setSelectedTabBtnWithIndex:2];
+            }];
+            break;
+        }
+        default:
+            break;
+    }
+    NSLog(@"%ld",sender.tag);
+}
+
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
-    UIView *view = [self tableView:_firstPageView viewForHeaderInSection:section];
+    UIView *view = [self tableView:tableView viewForHeaderInSection:section];
+    NSLog(@"gaodu:%f",view.bounds.size.height);
     return view.bounds.size.height;
 }
 
@@ -278,6 +339,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return 80.0;
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

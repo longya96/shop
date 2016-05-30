@@ -30,4 +30,5 @@
 -(instancetype)initWithArray:(NSArray*)array;
 -(void)AddTarBarBtn:(NSString *)name;//添加顶部标题项的名字
 -(void)TabBtnClick:(UIButton *)sender;//监听tabbar的点击
+- (void)setSelectedTabBtnWithIndex:(NSInteger)index;
 @end
