@@ -97,6 +97,9 @@
 		BE80F9C61CE080A4002A3893 /* IQKeyboardManager.bundle in Resources */ = {isa = PBXBuildFile; fileRef = BE80F9B71CE080A4002A3893 /* IQKeyboardManager.bundle */; };
 		BE80F9CD1CE0AC52002A3893 /* CSGoodsInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BE80F9CC1CE0AC52002A3893 /* CSGoodsInfoViewController.m */; };
 		BE80F9DB1CE0AD0B002A3893 /* CSNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = BE80F9DA1CE0AD0B002A3893 /* CSNavigationView.m */; };
+		BE9206771D0511BE00554F56 /* CSChoseView.m in Sources */ = {isa = PBXBuildFile; fileRef = BE9206761D0511BE00554F56 /* CSChoseView.m */; };
+		BE92067A1D05121500554F56 /* CSTypeView.m in Sources */ = {isa = PBXBuildFile; fileRef = BE9206791D05121500554F56 /* CSTypeView.m */; };
+		BE92067D1D05123300554F56 /* CSBuyCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = BE92067C1D05123300554F56 /* CSBuyCountView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -289,6 +292,12 @@
 		BE80F9CC1CE0AC52002A3893 /* CSGoodsInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSGoodsInfoViewController.m; sourceTree = "<group>"; };
 		BE80F9D91CE0AD0B002A3893 /* CSNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSNavigationView.h; sourceTree = "<group>"; };
 		BE80F9DA1CE0AD0B002A3893 /* CSNavigationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSNavigationView.m; sourceTree = "<group>"; };
+		BE9206751D0511BE00554F56 /* CSChoseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSChoseView.h; path = CSAddGoodsView/CSChoseView.h; sourceTree = "<group>"; };
+		BE9206761D0511BE00554F56 /* CSChoseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CSChoseView.m; path = CSAddGoodsView/CSChoseView.m; sourceTree = "<group>"; };
+		BE9206781D05121500554F56 /* CSTypeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSTypeView.h; path = CSAddGoodsView/CSTypeView.h; sourceTree = "<group>"; };
+		BE9206791D05121500554F56 /* CSTypeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CSTypeView.m; path = CSAddGoodsView/CSTypeView.m; sourceTree = "<group>"; };
+		BE92067B1D05123300554F56 /* CSBuyCountView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CSBuyCountView.h; path = CSAddGoodsView/CSBuyCountView.h; sourceTree = "<group>"; };
+		BE92067C1D05123300554F56 /* CSBuyCountView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CSBuyCountView.m; path = CSAddGoodsView/CSBuyCountView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -363,6 +372,7 @@
 		2C56352C1CC7135A0017B3E3 /* BasicViews */ = {
 			isa = PBXGroup;
 			children = (
+				BE9206741D05117900554F56 /* CSAddGoodsView */,
 				BE80F9D81CE0AD0B002A3893 /* CSNavigationView */,
 				BE64BCC61CDB38CB009E88EB /* CSGoodsInfoViews */,
 				BE64BCC21CDB3582009E88EB /* CSGoodsdetailsTopTabBar */,
@@ -910,6 +920,19 @@
 			path = CSNavigationView;
 			sourceTree = "<group>";
 		};
+		BE9206741D05117900554F56 /* CSAddGoodsView */ = {
+			isa = PBXGroup;
+			children = (
+				BE9206751D0511BE00554F56 /* CSChoseView.h */,
+				BE9206761D0511BE00554F56 /* CSChoseView.m */,
+				BE9206781D05121500554F56 /* CSTypeView.h */,
+				BE9206791D05121500554F56 /* CSTypeView.m */,
+				BE92067B1D05123300554F56 /* CSBuyCountView.h */,
+				BE92067C1D05123300554F56 /* CSBuyCountView.m */,
+			);
+			name = CSAddGoodsView;
+			sourceTree = "<group>";
+		};
 		BE9B94DB1CDEF1E400EAD783 /* CSLoginViewController */ = {
 			isa = PBXGroup;
 			children = (
@@ -1039,6 +1062,7 @@
 				BE2DF3F21CFC14F3008FA6B8 /* MJRefreshBaseView.m in Sources */,
 				BE80F9871CE079D6002A3893 /* SDWebImageDownloader.m in Sources */,
 				BE80F9BB1CE080A4002A3893 /* IQUIView+Hierarchy.m in Sources */,
+				BE9206771D0511BE00554F56 /* CSChoseView.m in Sources */,
 				BE80F98E1CE079D6002A3893 /* UIImage+WebP.m in Sources */,
 				BE64BCE01CDB6435009E88EB /* CSCarTableViewCell.m in Sources */,
 				BE80F95B1CE07975002A3893 /* TADotView.m in Sources */,
@@ -1079,6 +1103,7 @@
 				BE80F93C1CE032C9002A3893 /* CSLoginView.m in Sources */,
 				BE80F95F1CE07975002A3893 /* UIView+SDExtension.m in Sources */,
 				BE64BCFD1CDB6907009E88EB /* MASConstraintMaker.m in Sources */,
+				BE92067A1D05121500554F56 /* CSTypeView.m in Sources */,
 				BE80F9BF1CE080A4002A3893 /* IQKeyboardReturnKeyHandler.m in Sources */,
 				185148DD1CD7309300A80E1E /* CSShopSortViewController.m in Sources */,
 				BE80F9C31CE080A4002A3893 /* IQTitleBarButtonItem.m in Sources */,
@@ -1099,6 +1124,7 @@
 				185148021CD5C5F000A80E1E /* CSCarViewController.m in Sources */,
 				BE80F98A1CE079D6002A3893 /* SDWebImagePrefetcher.m in Sources */,
 				BE80F9BD1CE080A4002A3893 /* IQUIWindow+Hierarchy.m in Sources */,
+				BE92067D1D05123300554F56 /* CSBuyCountView.m in Sources */,
 				185148051CD5C65200A80E1E /* CSMineViewController.m in Sources */,
 				185148081CD5C6B300A80E1E /* CSDiscoveryViewController.m in Sources */,
 				BE80F9911CE079D6002A3893 /* UIView+WebCacheOperation.m in Sources */,
